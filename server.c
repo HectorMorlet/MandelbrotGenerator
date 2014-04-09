@@ -26,6 +26,7 @@ int createServer(int port);
 int waitForConnection(int socket);
 
 void replyToClient(int client);
+static void serveHTML(int socket);
 
 
 int main(int argc, char *argv[]) {
@@ -112,6 +113,9 @@ int waitForConnection(int server) {
 
 
 void replyToClient(int client) {
+   // TODO make it reply either a bitmap or the mandel brot viewer (as Richard siad to do)
+   // Do this using the function servHTML(int socket)
+
 	int success;
 	
 	char *header = "HTTP/1.0 200 OK\r\n"
@@ -138,4 +142,23 @@ void replyToClient(int client) {
 	
 	success = write(client, image, sizeof(image));
 	assert(success >= 0);
+}
+
+
+static void serveHTML(int socket) {
+   char* message;
+ 
+   // first send the http response header
+   message =
+      "HTTP/1.0 200 Found\n"
+      "Content-Type: text/html\n"
+      "\n";
+   printf ("about to send=> %s\n", message);
+   write (socket, message, strlen (message));
+ 
+   message =
+      "<!DOCTYPE html>\n"
+      "<script src=\"https://almondbread.cse.unsw.edu.au/tiles.js\"></script>"
+      "\n";      
+   write (socket, message, strlen (message));
 }
