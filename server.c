@@ -153,12 +153,12 @@ static void serveHTML(int socket) {
       "HTTP/1.0 200 Found\n"
       "Content-Type: text/html\n"
       "\n";
-   printf ("about to send=> %s\n", message);
-   write (socket, message, strlen (message));
+   printf("about to send=> %s\n", message);
+   write(socket, message, strlen(message));
  
    message =
       "<!DOCTYPE html>\n"
       "<script src=\"https://almondbread.cse.unsw.edu.au/tiles.js\"></script>"
       "\n";      
-   write (socket, message, strlen (message));
+   write(socket, message, strlen(message));
 }

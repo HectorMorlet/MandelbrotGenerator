@@ -7,4 +7,4 @@
  *
  */
  
-int escapeSteps (double x, double y);
+int escapeSteps(double x, double y);
