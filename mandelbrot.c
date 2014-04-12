@@ -29,8 +29,9 @@
 #define IMAGE_REQUEST_TYPE  0
 #define VIEWER_REQUEST_TYPE 1
 
-#define MAX_STEPS        256
-#define SET_EXCEED_VALUE 4.0
+#define MAX_STEPS            256
+#define SET_EXCEED_VALUE     4.0
+#define MAX_URL_PARAM_LENGTH 30
 
 #define FRACTAL_WIDTH  512
 #define FRACTAL_HEIGHT 512
@@ -178,9 +179,7 @@ static int determineRequestTypeForPath(char *path) {
 	if (!extention) {
 		type = VIEWER_REQUEST_TYPE;
 	} else {
-		extention++;
-
-		if (strcmp(extention, "bmp") == 0) {
+		if (strcmp(extention, ".bmp") == 0) {
 			type = IMAGE_REQUEST_TYPE;
 		} else {
 			type = VIEWER_REQUEST_TYPE;
@@ -192,16 +191,19 @@ static int determineRequestTypeForPath(char *path) {
 
 
 static double parseX(char *path) {
-	char *xString = strchr(path, 'x');
-	int x;
+	char *str = strchr(path, 'x');
+	double x;
 
-	if (!x) {
-		x = 0;
+	if (!str) {
+		x = 0.0;
 	} else {
-		xString += 2;
+		str++;
 
-		char *rightOfString = strchr(x, '_');
-		strncat(x, xString, xString - rightOfString);
+		char *end = strchr(x, '_');
+		char num[MAX_URL_PARAM_LENGTH];
+		strncat(num, str, str - end);
+
+		sscanf(num, "%f", &x);
 	}
 
 	return x;
@@ -209,16 +211,19 @@ static double parseX(char *path) {
 
 
 static double parseY(char *path) {
-	char *yString = strchr(path, 'y');
-	int y;
+	char *str = strchr(path, 'y');
+	double y;
 
-	if (!y) {
-		y = 0;
+	if (!str) {
+		y = 0.0;
 	} else {
-		yString += 2;
+		str++;
 
-		char *rightOfString = strchr(y, '_');
-		strncat(y, yString, yString - rightOfString);
+		char *end = strchr(y, '_');
+		char num[MAX_URL_PARAM_LENGTH];
+		strncat(num, str, str - end);
+
+		sscanf(num, "%f", &y);
 	}
 
 	return y;
@@ -226,19 +231,22 @@ static double parseY(char *path) {
 
 
 static int parseZoom(char *path) {
-	char *yString = strchr(path, 'z');
-	int z;
+	char *str = strchr(path, 'z');
+	int zoom;
 
-	if (!z) {
-		z = 0;
+	if (!str) {
+		zoom = 0;
 	} else {
-		zString += 2;
+		str++;
 
-		char *rightOfString = strchr(z, '.');
-		strncat(z, zString, zString - rightOfString);
+		char *end = strchr(zoom, '.');
+		char num[MAX_URL_PARAM_LENGTH];
+		strncat(num, str, str - end);
+
+		sscanf(num, "%d", &zoom);
 	}
 
-	return z;
+	return zoom;
 }
 
 
