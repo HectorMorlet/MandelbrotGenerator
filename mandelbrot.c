@@ -198,7 +198,7 @@ static double parseX(char *path) {
 	if (!x) {
 		x = 0;
 	} else {
-		xString += 2;
+		xString++;
 
 		char *rightOfString = strchr(x, '_');
 		strncat(x, xString, xString - rightOfString);
@@ -215,7 +215,7 @@ static double parseY(char *path) {
 	if (!y) {
 		y = 0;
 	} else {
-		yString += 2;
+		yString++;
 
 		char *rightOfString = strchr(y, '_');
 		strncat(y, yString, yString - rightOfString);
@@ -232,7 +232,7 @@ static int parseZoom(char *path) {
 	if (!z) {
 		z = 0;
 	} else {
-		zString += 2;
+		zString++;
 
 		char *rightOfString = strchr(z, '.');
 		strncat(z, zString, zString - rightOfString);
@@ -386,7 +386,20 @@ void runTests(void) {
 
 
 void testPathParsing(void) {
+	assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == )
+	assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == )
+	assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == )
+	assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == )
 
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == )
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == )
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == )
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == )
+
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == )
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.234234.bmp") == )
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == )
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.234324.bmp") == )
 }
 
 
