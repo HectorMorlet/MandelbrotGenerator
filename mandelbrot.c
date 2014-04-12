@@ -16,6 +16,7 @@
 #include <netinet/in.h>
 
 #include "mandelbrot.h"
+#include "pixelColor.h"
 
 
 #define PORT                8080
@@ -23,6 +24,15 @@
 
 #define IMAGE_REQUEST_TYPE  0
 #define VIEWER_REQUEST_TYPE 1
+
+#define true  1
+#define false 0
+
+#define MAX_STEPS        256
+#define SET_EXCEED_VALUE 4.0
+
+
+typedef byte unsigned char;
 
 
 static int createServer(int port);
@@ -33,6 +43,10 @@ static void respondToClient(int socket, char *path);
 static int determineRequestTypeForPath(char *path);
 static void serveBitmap(int socket, char *path);
 static void serveFractalViewer(int socket, char *path);
+
+static double parseX(char *path);
+static double parseY(char *path);
+static int parseZoom(char *path);
 
 
 
@@ -82,7 +96,7 @@ int main(int argc, char *argv[]) {
 }
 
 
-int createServer(int port) {
+static int createServer(int port) {
 	// Create a TCP socket
 	int server = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -114,7 +128,7 @@ int createServer(int port) {
 }
 
 
-int waitForConnection(int server) {
+static int waitForConnection(int server) {
 	// Listen for incomming data
 	const int maxBacklog = 10;
 	listen(server, maxBacklog);
@@ -137,11 +151,11 @@ int waitForConnection(int server) {
 
 
 // -------------------------------------------- //
-//   Server Response                            //
+//   Request URL Parsing                        //
 // -------------------------------------------- //
 
 
-int determineRequestTypeForPath(char *path) {
+static int determineRequestTypeForPath(char *path) {
 	char *extention = strrchr(path, '.');
 
 	if (!extention) {
@@ -158,7 +172,28 @@ int determineRequestTypeForPath(char *path) {
 }
 
 
-void respondToClient(int socket, char *path) {
+static double parseX(char *path) {
+
+}
+
+
+static double parseY(char *path) {
+
+}
+
+
+static int parseZoom(char *path) {
+
+}
+
+
+
+// -------------------------------------------- //
+//   Server Response                            //
+// -------------------------------------------- //
+
+
+static void respondToClient(int socket, char *path) {
 	int requestType = determineRequestTypeForPath(path);
 	if (requestType == VIEWER_REQUEST_TYPE) {
 		serveFractalViewer(socket, path);
@@ -171,9 +206,10 @@ void respondToClient(int socket, char *path) {
 static void serveBitmap(int socket, char *path) {
 	int success;
 
-	char *header = "HTTP/1.0 200 OK\r\n"
-					"Content-Type: image/bmp\r\n"
-					"\r\n";
+	char *header =
+		"HTTP/1.0 200 OK\r\n"
+		"Content-Type: image/bmp\r\n"
+		"\r\n";
 
 	success = write(socket, header, strlen(header));
 	assert(success >= 0);
@@ -222,6 +258,31 @@ static void serveFractalViewer(int socket, char *path) {
 // -------------------------------------------- //
 
 
+static void generateFractalBitmap(int socket) {
+
+}
+
+
 int escapeSteps(double x, double y) {
-	return 0;
+	int i = 0;
+	int isInSet = true;
+
+	double r = x;
+	double s = y;
+	while (i < MAX_STEPS && isInSet) {
+		double currentR = r;
+		double currentS = s;
+
+		r = currentR * currentR - currentS * currentS + x;
+		s = 2 * currentR * currentS + y;
+
+		double check = r * r + s * s;
+		if (check > SET_EXCEED_VALUE) {
+			isInSet = false;
+		} else {
+			i++;
+		}
+	}
+
+	return i;
 }
