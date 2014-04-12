@@ -25,7 +25,6 @@ Pointn = (Pointn-1)2 + (x,y) # THIS DOES NOT MAKE SENSE
 # MUST FIND OUT HOW THE MANDELBROT SET IS CALCULATED
 
 PLAN:
-What to do for the mandelbrot server:
 Make a server that serves a 512*512 blank bmp picture
 Make a function to find out if a particular point is in or out the mandelbrot set (within 255 iterations)
 Print it out in ascii
