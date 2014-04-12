@@ -58,6 +58,11 @@ static void writeFractal(int socket, double startX, double startY,
 	int zoom);
 
 
+void runTests(void);
+void testPathParsing(void);
+void testDetermineRequestType(void);
+
+
 
 // -------------------------------------------- //
 //   Server                                     //
@@ -65,6 +70,8 @@ static void writeFractal(int socket, double startX, double startY,
 
 
 int main(int argc, char *argv[]) {
+	runTests();
+
 	printf("Starting server...\n");
 
 	int server = createServer(PORT);
@@ -324,4 +331,32 @@ int escapeSteps(double x, double y) {
 	}
 
 	return i;
+}
+
+
+// -------------------------------------------- //
+//   Unit Tests                                 //
+// -------------------------------------------- //
+
+
+void runTests(void) {
+	testDetermineRequestType();
+	testPathParsing();
+
+	printf("All tests passed!\n");
+	printf("We are awesome!\n");
+}
+
+
+void testPathParsing(void) {
+
+}
+
+
+void testDetermineRequestType(void) {
+	assert(determineRequestTypeForPath("/hello") == VIEWER_REQUEST_TYPE);
+	assert(determineRequestTypeForPath("/test/owiejf") == VIEWER_REQUEST_TYPE);
+	assert(determineRequestTypeForPath("/test.bmp") == IMAGE_REQUEST_TYPE);
+	assert(determineRequestTypeForPath("/meh/meh2.bmp") == IMAGE_REQUEST_TYPE);
+	assert(determineRequestTypeForPath("/index.bmp") == IMAGE_REQUEST_TYPE);
 }
