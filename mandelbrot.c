@@ -51,7 +51,8 @@ static double parseY(char *path);
 static int parseZoom(char *path);
 
 static void writeBitmapHeader(int socket);
-static void writePixel(int socket, unsigned char r, unsigned char g, unsigned char b);
+static void writePixel(int socket, unsigned char r, unsigned char g,
+	unsigned char b);
 static void writeFractal(int socket, double startX, double startY,
 	int zoom);
 
@@ -314,7 +315,8 @@ static void writeBitmapHeader(int socket) {
 }
 
 
-static void writePixel(int socket, unsigned char r, unsigned char g, unsigned char b) {
+static void writePixel(int socket, unsigned char r, unsigned char g,
+		unsigned char b) {
 	int success;
 
 	success = write(socket, &r, sizeof(r));
