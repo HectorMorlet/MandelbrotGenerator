@@ -37,9 +37,6 @@
 #define FRACTAL_HEIGHT 512
 
 
-typedef byte unsigned char;
-
-
 static int createServer(int port);
 static int waitForConnection(int server);
 
@@ -54,7 +51,7 @@ static double parseY(char *path);
 static int parseZoom(char *path);
 
 static void writeBitmapHeader(int socket);
-static void writePixel(int socket, byte r, byte g, byte b);
+static void writePixel(int socket, unsigned char r, unsigned char g, unsigned char b);
 static void writeFractal(int socket, double startX, double startY,
 	int zoom);
 
@@ -199,11 +196,11 @@ static double parseX(char *path) {
 	} else {
 		str++;
 
-		char *end = strchr(x, '_');
+		char *end = strchr(str, '_');
 		char num[MAX_URL_PARAM_LENGTH];
 		strncat(num, str, str - end);
 
-		sscanf(num, "%f", &x);
+		sscanf(num, "%lf", &x);
 	}
 
 	return x;
@@ -219,11 +216,11 @@ static double parseY(char *path) {
 	} else {
 		str++;
 
-		char *end = strchr(y, '_');
+		char *end = strchr(str, '_');
 		char num[MAX_URL_PARAM_LENGTH];
 		strncat(num, str, str - end);
 
-		sscanf(num, "%f", &y);
+		sscanf(num, "%lf", &y);
 	}
 
 	return y;
@@ -239,7 +236,7 @@ static int parseZoom(char *path) {
 	} else {
 		str++;
 
-		char *end = strchr(zoom, '.');
+		char *end = strchr(str, '.');
 		char num[MAX_URL_PARAM_LENGTH];
 		strncat(num, str, str - end);
 
@@ -267,9 +264,9 @@ static void respondToClient(int socket, char *path) {
 
 
 static void serveBitmap(int socket, char *path) {
+	int zoom = parseZoom(path);
 	double startX = parseX(path) * exp2(-zoom);
 	double startY = parseY(path) * exp2(-zoom);
-	int zoom = parseZoom(path);
 
 	writeFractal(socket, startX, startY, zoom);
 }
@@ -302,7 +299,7 @@ static void serveFractalViewer(int socket, char *path) {
 static void writeBitmapHeader(int socket) {
 	int success;
 
-	byte header[] = {
+	unsigned char header[] = {
 		0x42, 0x4d, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
 		0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x03, 0x00,
@@ -310,23 +307,23 @@ static void writeBitmapHeader(int socket) {
 		0x00, 0x00, 0x24, 0x00, 0x00, 0x00, 0x13, 0x0b,
 		0x00, 0x00, 0x13, 0x0b, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	}
+	};
 
 	success = write(socket, header, sizeof(header));
 	assert(success >= 0);
 }
 
 
-static void writePixel(int socket, byte r, byte g, byte b) {
+static void writePixel(int socket, unsigned char r, unsigned char g, unsigned char b) {
 	int success;
 
-	success = write(socket, r, sizeof(r));
+	success = write(socket, &r, sizeof(r));
 	assert(success >= 0);
 
-	success = write(socket, g, sizeof(g));
+	success = write(socket, &g, sizeof(g));
 	assert(success >= 0);
 
-	success = write(socket, b, sizeof(b));
+	success = write(socket, &b, sizeof(b));
 	assert(success >= 0);
 }
 
@@ -343,11 +340,11 @@ static void writeFractal(int socket, double startX, double startY,
 			double actualY = y * exp2(-zoom);
 			int steps = escapeSteps(actualX + startX, actualY + startY);
 
-			byte red = (byte) stepsToRed(steps);
-			byte green = (byte) stepsToGreen(steps);
-			byte blue = (byte) stepsToBlue(steps);
+			unsigned char red = (unsigned char) stepsToRed(steps);
+			unsigned char green = (unsigned char) stepsToGreen(steps);
+			unsigned char blue = (unsigned char) stepsToBlue(steps);
 
-			writePixel(socket, red, green, blue)
+			writePixel(socket, red, green, blue);
 		}
 	}
 }
