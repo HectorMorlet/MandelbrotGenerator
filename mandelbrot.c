@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 #include <unistd.h>
 #include <netinet/in.h>
@@ -19,17 +20,20 @@
 #include "pixelColor.h"
 
 
+#define true  1
+#define false 0
+
 #define PORT                8080
 #define REQUEST_BUFFER_SIZE 1000
 
 #define IMAGE_REQUEST_TYPE  0
 #define VIEWER_REQUEST_TYPE 1
 
-#define true  1
-#define false 0
-
 #define MAX_STEPS        256
 #define SET_EXCEED_VALUE 4.0
+
+#define FRACTAL_WIDTH  512
+#define FRACTAL_HEIGHT 512
 
 
 typedef byte unsigned char;
@@ -47,6 +51,11 @@ static void serveFractalViewer(int socket, char *path);
 static double parseX(char *path);
 static double parseY(char *path);
 static int parseZoom(char *path);
+
+static void writeBitmapHeader(int socket);
+static void writePixel(int socket, byte r, byte g, byte b);
+static void writeFractal(int socket, double startX, double startY,
+	int zoom);
 
 
 
@@ -156,19 +165,22 @@ static int waitForConnection(int server) {
 
 
 static int determineRequestTypeForPath(char *path) {
+	int type = VIEWER_REQUEST_TYPE;
 	char *extention = strrchr(path, '.');
 
 	if (!extention) {
-		return VIEWER_REQUEST_TYPE;
+		type = VIEWER_REQUEST_TYPE;
 	} else {
 		extention++;
 
 		if (strcmp(extention, "bmp") == 0) {
-			return IMAGE_REQUEST_TYPE;
+			type = IMAGE_REQUEST_TYPE;
 		} else {
-			return VIEWER_REQUEST_TYPE;
+			type = VIEWER_REQUEST_TYPE;
 		}
 	}
+
+	return type;
 }
 
 
@@ -204,33 +216,11 @@ static void respondToClient(int socket, char *path) {
 
 
 static void serveBitmap(int socket, char *path) {
-	int success;
+	double startX = parseX(path) * exp2(-zoom);
+	double startY = parseY(path) * exp2(-zoom);
+	int zoom = parseZoom(path);
 
-	char *header =
-		"HTTP/1.0 200 OK\r\n"
-		"Content-Type: image/bmp\r\n"
-		"\r\n";
-
-	success = write(socket, header, strlen(header));
-	assert(success >= 0);
-
-	unsigned char image[] = {
-		0x42,0x4d,0x5a,0x00,0x00,0x00,0x00,0x00,
-		0x00,0x00,0x36,0x00,0x00,0x00,0x28,0x00,
-		0x00,0x00,0x03,0x00,0x00,0x00,0x03,0x00,
-		0x00,0x00,0x01,0x00,0x18,0x00,0x00,0x00,
-		0x00,0x00,0x24,0x00,0x00,0x00,0x13,0x0b,
-		0x00,0x00,0x13,0x0b,0x00,0x00,0x00,0x00,
-		0x00,0x00,0x00,0x00,0x00,0x00,0x07,0x07,
-		0xff,0x07,0x07,0x07,0x07,0x07,0xff,0x00,
-		0x00,0x0e,0x07,0x07,0x07,0x66,0x07,0x07,
-		0x07,0x07,0x07,0x00,0x00,0x0d,0x07,0x07,
-		0x07,0x07,0x07,0x07,0xff,0xff,0xff,0x00,
-		0x00,0x0d
-	};
-
-	success = write(socket, image, sizeof(image));
-	assert(success >= 0);
+	writeFractal(socket, startX, startY, zoom);
 }
 
 
@@ -258,8 +248,57 @@ static void serveFractalViewer(int socket, char *path) {
 // -------------------------------------------- //
 
 
-static void generateFractalBitmap(int socket) {
+static void writeBitmapHeader(int socket) {
+	int success;
 
+	byte header[] = {
+		0x42, 0x4d, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
+		0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x03, 0x00,
+		0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x24, 0x00, 0x00, 0x00, 0x13, 0x0b,
+		0x00, 0x00, 0x13, 0x0b, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	}
+
+	success = write(socket, header, sizeof(header));
+	assert(success >= 0);
+}
+
+
+static void writePixel(int socket, byte r, byte g, byte b) {
+	int success;
+
+	success = write(socket, r, sizeof(r));
+	assert(success >= 0);
+
+	success = write(socket, g, sizeof(g));
+	assert(success >= 0);
+
+	success = write(socket, b, sizeof(b));
+	assert(success >= 0);
+}
+
+
+static void writeFractal(int socket, double startX, double startY,
+		int zoom) {
+	writeBitmapHeader(socket);
+
+	int x = -(FRACTAL_WIDTH / 2);
+	int y = -(FRACTAL_HEIGHT / 2);
+	while (x < FRACTAL_WIDTH) {
+		while (y < FRACTAL_HEIGHT) {
+			double actualX = x * exp2(-zoom);
+			double actualY = y * exp2(-zoom);
+			int steps = escapeSteps(actualX + startX, actualY + startY);
+
+			byte red = (byte) stepsToRed(steps);
+			byte green = (byte) stepsToGreen(steps);
+			byte blue = (byte) stepsToBlue(steps);
+
+			writePixel(socket, red, green, blue)
+		}
+	}
 }
 
 
