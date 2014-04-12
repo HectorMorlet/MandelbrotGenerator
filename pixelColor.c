@@ -13,34 +13,46 @@
 #include "pixelColor.h"
 
 
-#define MAX_STEPS 255
-#define MIN_STEPS 1
+#define MAX_STEPS 256
 
-#define RED_BLUE_VALUE
-#define RED_ORANGE_VALUE
-#define BLUE_BLUE_VALUE
-#define BLUE_ORANGE_VALUE
-#define GREEN_BLUE_VALUE
-#define GREEN_ORANGE_VALUE
+#define ORANGE_R 255
+#define ORANGE_G 0
+#define ORANGE_B 0
+
+#define BLUE_R 0
+#define BLUE_G 0
+#define BLUE_B 255
 
 
-static int lerp(start, end, t);
+static int lerp(int start, int end, double t);
 
-unsigned char stepsToRed(int steps){
-	return lerp(RED_BLUE_VALUE, RED_ORANGE_VALUE, steps/MAX_STEPS);
+
+// -------------------------------------------- //
+//   Color Generation                           //
+// -------------------------------------------- //
+
+
+unsigned char stepsToRed(int steps) {
+	return lerp(ORANGE_R, BLUE_R, (double) steps / MAX_STEPS);
 }
 
 
-unsigned char stepsToBlue(int steps){
-	return lerp(BLUE_BLUE_VALUE, BLUE_ORANGE_VALUE, steps/MAX_STEPS);
+unsigned char stepsToGreen(int steps) {
+	return lerp(ORANGE_G, BLUE_G, (double) steps / MAX_STEPS);
 }
 
 
-unsigned char stepsToGreen(int steps){
-	return lerp(GREEN_BLUE_VALUE, GREEN_ORANGE_VALUE, steps/MAX_STEPS);
+unsigned char stepsToBlue(int steps) {
+	return lerp(ORANGE_B, BLUE_B, (double) steps / MAX_STEPS);
 }
 
 
-static int lerp(start, end, t) {
+
+// -------------------------------------------- //
+//   Linear Interpolation                       //
+// -------------------------------------------- //
+
+
+static int lerp(int start, int end, double t) {
 	return start + (end - start) * t;
 }
