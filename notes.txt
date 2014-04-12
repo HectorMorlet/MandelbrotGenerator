@@ -25,15 +25,15 @@ Pointn = (Pointn-1)2 + (x,y) # THIS DOES NOT MAKE SENSE
 # MUST FIND OUT HOW THE MANDELBROT SET IS CALCULATED
 
 PLAN:
-What to do pre-mandelbrot server:
+What to do for the mandelbrot server:
 Make a server that serves a 512*512 blank bmp picture
 Make a function to find out if a particular point is in or out the mandelbrot set (within 255 iterations)
 Print it out in ascii
 Print it out in ascii on a webpage
 Make it so when nothing is requested (just http://localhost:[port]), the website returns the code above
 Convert this into a bmp image to be printed out onto a webpage
-Make the r,g,b color creator (based on the iterations passed in) work
-Make it serve a particular zoom level and (x,y)
+***Make the r,g,b color creator (based on the iterations passed in) work
+Make it serve a particular zoom level and (x,y) 
 
 
 SUBMISSION:
