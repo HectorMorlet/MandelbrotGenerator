@@ -40,6 +40,7 @@ unsigned char stepsToGreen(int steps){
    return lerp(GREEN_LERP_START, GREEN_LERP_END, steps/MAX_STEPS);
 }
 
+
 static int lerp(start, end, time) {
    return start+(end-start)*time;
 }

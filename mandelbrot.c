@@ -173,17 +173,53 @@ static int determineRequestTypeForPath(char *path) {
 
 
 static double parseX(char *path) {
+	char *xString = strchr(path, 'x');
+	int x;
 
+	if (!x) {
+		x = 0;
+	} else {
+		xString += 2;
+
+		char *rightOfString = strchr(x, '_');
+		strncat(x, xString, xString - rightOfString);
+	}
+
+	return x;
 }
 
 
 static double parseY(char *path) {
+	char *yString = strchr(path, 'y');
+	int y;
 
+	if (!y) {
+		y = 0;
+	} else {
+		yString += 2;
+
+		char *rightOfString = strchr(y, '_');
+		strncat(y, yString, yString - rightOfString);
+	}
+
+	return y;
 }
 
 
 static int parseZoom(char *path) {
+	char *yString = strchr(path, 'z');
+	int z;
 
+	if (!z) {
+		z = 0;
+	} else {
+		zString += 2;
+
+		char *rightOfString = strchr(z, '.');
+		strncat(z, zString, zString - rightOfString);
+	}
+
+	return z;
 }
 
 
