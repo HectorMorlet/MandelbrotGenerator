@@ -1,0 +1,43 @@
+NOTES:
+Make it zoom using the formula: distance between pixels = 2^-z
+Width & height (in terms of pixels) is given by the formula: 511*distance betw. pixels
+Format for input: http://localhost:[port]/tile_x-[x]_y[y]_z[zoom level].bmp
+If all that is type in is http://localhost:[port], return with code:
+static void serveHTML (int socket) {
+   char* message;
+ 
+   // first send the http response header
+   message =
+      "HTTP/1.0 200 Found\n"
+      "Content-Type: text/html\n"
+      "\n";
+   printf ("about to send=> %s\n", message);
+   write (socket, message, strlen (message));
+ 
+   message =
+      "<!DOCTYPE html>\n"
+      "<script src=\"https://almondbread.cse.unsw.edu.au/tiles.js\"></script>"
+      "\n";      
+   write (socket, message, strlen (message));
+}
+Generate the picture of the mandelbrot set by iterating over each x, y in the picture, finding their x,y in the whole of the set, then apply the formula:
+Pointn = (Pointn-1)2 + (x,y) # THIS DOES NOT MAKE SENSE
+# MUST FIND OUT HOW THE MANDELBROT SET IS CALCULATED
+
+PLAN:
+What to do pre-mandelbrot server:
+Make a server that serves a 512*512 blank bmp picture
+Make a function to find out if a particular point is in or out the mandelbrot set (within 255 iterations)
+Print it out in ascii
+Print it out in ascii on a webpage
+Make it so when nothing is requested (just http://localhost:[port]), the website returns the code above
+Convert this into a bmp image to be printed out onto a webpage
+Make the r,g,b color creator (based on the iterations passed in) work
+Make it serve a particular zoom level and (x,y)
+
+
+SUBMISSION:
+DO NOT CHANGE THE TWO .h FILES FOR TESTING PURPOSES
+DO NOT CREATE ANY OTHER FILES (than mandelbrot.c, mandelbrot.h, pixelColor.h, and pixelColor.c)
+Submit mandelbrot.c and pixelColor.c
+Submit pretty images and pixelColor.c file to snapshot competition (optional)
