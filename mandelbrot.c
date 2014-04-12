@@ -394,20 +394,20 @@ void runTests(void) {
 
 
 void testPathParsing(void) {
-	assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == )
-	assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == )
-	assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == )
-	assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == )
+	assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == -12.12414);
+	assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == -123);
+	assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == 134.4124);
+	assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == 235);
 
-	assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == )
-	assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == )
-	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == )
-	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == )
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == 235235.234234);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == 234234);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == -234234);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == -234234.234234);
 
-	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == )
-	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.234234.bmp") == )
-	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == )
-	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.234324.bmp") == )
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == -2343223434);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.234324.bmp") == -23423324);
 }
 
 
