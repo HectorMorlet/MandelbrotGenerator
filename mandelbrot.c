@@ -21,12 +21,18 @@
 #define PORT                8080
 #define REQUEST_BUFFER_SIZE 1000
 
+#define IMAGE_REQUEST_TYPE  0
+#define VIEWER_REQUEST_TYPE 1
+
 
 static int createServer(int port);
 static int waitForConnection(int server);
 
-static void respondToClient(int client, char *path);
-static void serveHTML(int socket);
+static void respondToClient(int socket, char *path);
+
+static int determineRequestTypeForPath(char *path);
+static void serveBitmap(int socket, char *path);
+static void serveFractalViewer(int socket, char *path);
 
 
 
@@ -135,18 +141,41 @@ int waitForConnection(int server) {
 // -------------------------------------------- //
 
 
-void respondToClient(int client, char *path) {
-	// TODO make it reply either a bitmap or the mandel brot viewer
-	// (as Richard said to do)
-	// Do this using the function serveHTML(int socket)
+int determineRequestTypeForPath(char *path) {
+	char *extention = strrchr(path, '.');
 
+	if (!extention) {
+		return VIEWER_REQUEST_TYPE;
+	} else {
+		extention++;
+
+		if (strcmp(extention, "bmp") == 0) {
+			return IMAGE_REQUEST_TYPE;
+		} else {
+			return VIEWER_REQUEST_TYPE;
+		}
+	}
+}
+
+
+void respondToClient(int socket, char *path) {
+	int requestType = determineRequestTypeForPath(path);
+	if (requestType == VIEWER_REQUEST_TYPE) {
+		serveFractalViewer(socket, path);
+	} else if (requestType == IMAGE_REQUEST_TYPE) {
+		serveBitmap(socket, path);
+	}
+}
+
+
+static void serveBitmap(int socket, char *path) {
 	int success;
 
 	char *header = "HTTP/1.0 200 OK\r\n"
 					"Content-Type: image/bmp\r\n"
 					"\r\n";
 
-	success = write(client, header, strlen(header));
+	success = write(socket, header, strlen(header));
 	assert(success >= 0);
 
 	unsigned char image[] = {
@@ -164,19 +193,18 @@ void respondToClient(int client, char *path) {
 		0x00,0x0d
 	};
 
-	success = write(client, image, sizeof(image));
+	success = write(socket, image, sizeof(image));
 	assert(success >= 0);
 }
 
 
-static void serveHTML(int socket) {
+static void serveFractalViewer(int socket, char *path) {
 	char *message;
 
 	message =
 		"HTTP/1.0 200 Found\n"
 		"Content-Type: text/html\n"
 		"\n";
-	printf("about to send=> %s\n", message);
 	write(socket, message, strlen(message));
 
 	message =
@@ -195,5 +223,5 @@ static void serveHTML(int socket) {
 
 
 int escapeSteps(double x, double y) {
-
+	return 0;
 }
