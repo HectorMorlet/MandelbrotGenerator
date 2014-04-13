@@ -404,7 +404,7 @@ void testPathParsing(void) {
 	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234);
 	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624);
 	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == -2343223434);
-	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.234324.bmp") == -23423324);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.bmp") == -23423324);
 }
 
 
