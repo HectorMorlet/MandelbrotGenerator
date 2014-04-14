@@ -190,16 +190,15 @@ static int determineRequestTypeForPath(char *path) {
 
 static double parseX(char *path) {
 	char *str = strchr(path, 'x');
-	
 	double x;
 
 	if (!str) {
 		x = 0.0;
 	} else {
 		str++;
-
 		sscanf(str, "%lf", &x);
 	}
+
 	return x;
 }
 
@@ -212,7 +211,6 @@ static double parseY(char *path) {
 		y = 0.0;
 	} else {
 		str++;
-
 		sscanf(str, "%lf", &y);
 	}
 	return y;
@@ -227,7 +225,6 @@ static int parseZoom(char *path) {
 		zoom = 0;
 	} else {
 		str++;
-
 		sscanf(str, "%d", &zoom);
 	}
 
@@ -267,26 +264,25 @@ static void serveBitmap(int socket, char *path) {
 
 static void serveFractalViewer (int socket) {
 	printf("Serving fractal viewer.\n");
+	char *message;
 
-   char* message;
+	// first send the http response header
+	message =
+		"HTTP/1.0 200 Found\r\n"
+		"Content-Type: text/html\r\n"
+		"\r\n";
+	printf("about to send=> %s\n", message);
+	write(socket, message, strlen(message));
 
-   // first send the http response header
-   message =
-      "HTTP/1.0 200 Found\r\n"
-      "Content-Type: text/html\r\n"
-      "\r\n";
-   printf ("about to send=> %s\n", message);
-   write (socket, message, strlen (message));
-
-   message =
-      "<!DOCTYPE html>\n"
-      "<html>\n"
-      "<body>\n"
-      "<script src=\"tiles.js\"></script>\n"
-      "</body>\n"
-      "</html>\n"
-      "\n";
-   write (socket, message, strlen (message));
+	message =
+		"<!DOCTYPE html>\n"
+		"<html>\n"
+		"<body>\n"
+		"<script src=\"tiles.js\"></script>\n"
+		"</body>\n"
+		"</html>\n"
+		"\n";
+	write(socket, message, strlen(message));
 }
 
 
@@ -350,6 +346,7 @@ static void writeFractal(int socket, double startX, double startY,
 
 			y++;
 		}
+
 		x++;
 	}
 }
