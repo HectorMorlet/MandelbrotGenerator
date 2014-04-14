@@ -190,6 +190,7 @@ static int determineRequestTypeForPath(char *path) {
 
 static double parseX(char *path) {
 	char *str = strchr(path, 'x');
+	
 	double x;
 
 	if (!str) {
@@ -197,14 +198,8 @@ static double parseX(char *path) {
 	} else {
 		str++;
 
-		char *end = strchr(str, '_');
-		char num[MAX_URL_PARAM_LENGTH];
-		strncat(num, str, end - str);
-		printf("swag5\n");
-
-		sscanf(num, "%lf", &x);
+		sscanf(str, "%lf", &x);
 	}
-
 	return x;
 }
 
@@ -217,49 +212,23 @@ static double parseY(char *path) {
 		y = 0.0;
 	} else {
 		str++;
-		printf("swag1\n");
 
-		char *end = strchr(str, '_');
-		printf("swag3\n");
-		int length = (end - str) + 1;
-		char num[length];
-		//int *num = 0;
-		printf("swag4\n");
-		printf("%d\n", (int)(end - str));
-		printf("%p\n", str);
-		printf("%c\n", *str);
-		printf("%p\n", num);
-		strncat(num, str, length - 1);
-		printf("swag5\n");
-
-		num[length - 1] = '\0';
-
-		sscanf(num, "%lf", &y);
+		sscanf(str, "%lf", &y);
 	}
-
 	return y;
 }
 
 
 static int parseZoom(char *path) {
-	printf("swag1\n");
 	char *str = strchr(path, 'z');
 	int zoom;
 
-	printf("swag2\n");
 	if (!str) {
 		zoom = 0;
 	} else {
-		printf("swag3\n");
 		str++;
 
-		char *end = strchr(str, '.bmp');
-		char num[MAX_URL_PARAM_LENGTH];
-		printf("swag4\n");
-		strncat(num, str, end - str);
-
-		printf("swag5\n");
-		sscanf(num, "%d", &zoom);
+		sscanf(str, "%d", &zoom);
 	}
 
 	return zoom;
@@ -274,6 +243,7 @@ static int parseZoom(char *path) {
 
 static void respondToClient(int socket, char *path) {
 	int requestType = determineRequestTypeForPath(path);
+
 	if (requestType == VIEWER_REQUEST_TYPE) {
 		serveFractalViewer(socket);
 	} else if (requestType == IMAGE_REQUEST_TYPE) {
@@ -284,8 +254,12 @@ static void respondToClient(int socket, char *path) {
 
 static void serveBitmap(int socket, char *path) {
 	int zoom = parseZoom(path);
-	double startX = parseX(path) * exp2(-zoom);
-	double startY = parseY(path) * exp2(-zoom);
+	double startX = parseX(path);// * exp2(-zoom);
+	double startY = parseY(path);// * exp2(-zoom);
+
+	printf("Serving bitmap with startX: %lf\n", startX);
+	printf("Serving bitmap with startY: %lf\n", startY);
+	printf("Serving bitmap with zoom: %d\n", zoom);
 
 	writeFractal(socket, startX, startY, zoom);
 }
@@ -365,6 +339,7 @@ static void writeFractal(int socket, double startX, double startY,
 		while (y < FRACTAL_HEIGHT/2) {
 			double actualX = x * exp2(-zoom);
 			double actualY = y * exp2(-zoom);
+
 			int steps = escapeSteps(actualX + startX, actualY + startY);
 
 			unsigned char red = (unsigned char) stepsToRed(steps);
@@ -386,7 +361,8 @@ int escapeSteps(double x, double y) {
 
 	double r = x;
 	double s = y;
-	while (i < MAX_STEPS && isInSet) {
+
+	while (i < MAX_STEPS && isInSet == true) {
 		double currentR = r;
 		double currentS = s;
 
@@ -422,20 +398,21 @@ void runTests(void) {
 
 void testPathParsing(void) {
 	// assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == -12.12414);
-	// assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == -123);
+	// printf("%lf\n", parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp"));
+	// assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == -123.0);
 	// assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == 134.4124);
 	// // This next assert is the only one that works. WTF
-	// assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == 235);
+	// assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == 235.0);
 
 	// assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == 235235.234234);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == 234234);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == -234234);
+	// assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == 234234.0);
+	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == -234234.0);
 	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == -234234.234234);
 
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == -234322344);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.bmp") == -23423324);
+	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234.0);
+	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624.0);
+	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == -234322344.0);
+	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.bmp") == -23423324.0);
 }
 
 
