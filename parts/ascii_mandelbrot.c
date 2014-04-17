@@ -1,4 +1,5 @@
 
+
 //
 //  Mandelbrot ASCII
 //  17 April 2014
@@ -64,5 +65,6 @@ int main(int argc, char *argv[]) {
 
 		printf("\n");
 	}
+
 	return EXIT_SUCCESS;
 }
