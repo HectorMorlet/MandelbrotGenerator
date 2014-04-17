@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 
 	int server = createServer(PORT);
 
-	int running = 1;
+	int running = true;
 	while (running) {
 		// Wait for a connection
 		int client = waitForConnection(server);
@@ -332,8 +332,8 @@ static void writeFractal(int socket, double startX, double startY,
 
 	int x = -(FRACTAL_WIDTH / 2);
 	int y = -(FRACTAL_HEIGHT / 2);
-	while (x < FRACTAL_WIDTH/2) {
-		while (y < FRACTAL_HEIGHT/2) {
+	while (x <= FRACTAL_WIDTH/2) {
+		while (y <= FRACTAL_HEIGHT/2) {
 			double actualX = x * exp2(-zoom);
 			double actualY = y * exp2(-zoom);
 
