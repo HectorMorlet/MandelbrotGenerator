@@ -2,7 +2,7 @@
 //
 //  mandelbrot.c
 //  Mandelbrot Generator
-//  Ben and Hector
+//  Ben Anderson and Hector Morlet
 //  9 April 2014
 //
 
@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
 
 	int running = true;
 	while (running) {
+		printf("Started server while loop...\n");
 		// Wait for a connection
 		int client = waitForConnection(server);
 
@@ -76,23 +77,34 @@ int main(int argc, char *argv[]) {
 		if (byteCount < 0) {
 			printf("Failed to read request from client!\n");
 		} else {
+			printf("Started main if statement...\n");
+
 			// Extract the path from the request
 			char *pathStart = strchr(request, ' ') + 1;
+			printf("pathStart extracted from request: %s\n", pathStart);
+
+			// Segmentation fault is caused by trying to read pathStart!!!!
 			char *pathEnd = strchr(pathStart, ' ') - 1;
+			printf("pathEnd extracted from request: %s\n", pathEnd);
+
 			int length = pathEnd - pathStart + 1;
 			char path[length + 1];
+			printf("Path length determined from request.\n");
 
 			strncpy(path, pathStart, length);
 			path[length] = '\0';
+			printf("Path extracted from request.\n");
 
 			// Respond to the client
 			printf("Responding to request for: %s\n", path);
-			respondTotClient(client, path);
+			respondToClient(client, path);
 		}
 
+		printf("Closing client connection...\n");
 		close(client);
 	}
 
+	printf("Closing server...\n");
 	close(server);
 
 	return EXIT_SUCCESS;
@@ -106,6 +118,8 @@ int main(int argc, char *argv[]) {
 
 
 static int createServer(int port) {
+	printf("Creating server...\n");
+
 	// Create a TCP socket
 	int server = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -138,6 +152,8 @@ static int createServer(int port) {
 
 
 static int waitForConnection(int server) {
+	printf("Waiting for connection...\n");
+
 	// Listen for incomming data
 	const int maxBacklog = 10;
 	listen(server, maxBacklog);
@@ -165,6 +181,8 @@ static int waitForConnection(int server) {
 
 
 static int determineRequestTypeForPath(char *path) {
+	printf("Determining request type...\n");
+
 	int type = VIEWER_REQUEST_TYPE;
 	char *extention = strrchr(path, '.');
 
@@ -183,6 +201,8 @@ static int determineRequestTypeForPath(char *path) {
 
 
 static double parseX(char *path) {
+	printf("Parsing X...\n");
+
 	char *str = strchr(path, 'x');
 	double x;
 
@@ -198,6 +218,8 @@ static double parseX(char *path) {
 
 
 static double parseY(char *path) {
+	printf("Parsing Y...\n");
+
 	char *str = strchr(path, 'y');
 	double y;
 
@@ -213,6 +235,8 @@ static double parseY(char *path) {
 
 
 static int parseZoom(char *path) {
+	printf("Parsing zoom...\n");
+
 	char *str = strchr(path, 'z');
 	int zoom;
 
@@ -234,6 +258,8 @@ static int parseZoom(char *path) {
 
 
 static void respondToClient(int socket, char *path) {
+	printf("Responding to client...\n");
+
 	int requestType = determineRequestTypeForPath(path);
 
 	if (requestType == VIEWER_REQUEST_TYPE) {
@@ -245,17 +271,20 @@ static void respondToClient(int socket, char *path) {
 
 
 static void serveBitmap(int socket, char *path) {
+	printf("Serving bitmap...\n");
 	int zoom = parseZoom(path);
 	double startX = parseX(path);
 	double startY = parseY(path);
 
-	printf("%d, %lf, %lf\n", zoom, startX, startY);
-
 	writeFractal(socket, startX, startY, zoom);
+
+	printf("BMP served: X: %lf, Y: %lf, Z: %d\n", startX, startY, zoom);
 }
 
 
 static void serveFractalViewer(int socket) {
+	printf("Serving fractal viewer...\n");
+
 	int success;
 	char *message;
 
@@ -286,15 +315,25 @@ static void serveFractalViewer(int socket) {
 
 
 static void writeBitmapHeader(int socket) {
+	printf("Writing bitmap header...\n");
 	int success;
 
 	unsigned char header[] = {
-		0x42, 0x4D, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x02,
-		0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x24, 0x00, 0x00, 0x00, 0x13, 0x0B,
-		0x00, 0x00, 0x13, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00
+		0x42, 0x4D, // Format ID
+		0x00, 0x00, 0x04, 0x00, // File size of the BMP in bytes CHANGABLE
+		0x00, 0x00, 0x00, 0x00, // Application specific
+		0x36, 0x00, 0x00, 0x00, // Position in the file where the pixel data starts
+		0x28, 0x00, 0x00, 0x00, // Size of the DIB header
+		0x00, 0x02, 0x00, 0x00, // Image width in pixels CHANGABLE
+		0x00, 0x02, 0x00, 0x00, // Image height in pixels CHANGABLE
+		0x01, 0x00, // Number of color planes
+		0x18, 0x00, // Number of bits per pixel
+		0x00, 0x00, 0x00, 0x00, // Compression used
+		0x00, 0x00, 0x0C, 0x00, // Size of the pixel array data CHANGABLE
+		0x13, 0x0B, 0x00, 0x00, // Horizontal resolution
+		0x13, 0x0B, 0x00, 0x00, // Vertical resolution
+		0x00, 0x00, 0x00, 0x00, // Number of colors in the palette
+		0x00, 0x00, 0x00, 0x00 // Number of important colors
 	};
 
 	success = write(socket, header, sizeof(header));
@@ -317,6 +356,8 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 
 static void writeFractal(int socket, double startX, double startY,
 		int zoom) {
+	printf("Writing fractal...\n");
+
 	writeBitmapHeader(socket);
 
 	int y = -(FRACTAL_HEIGHT / 2);
