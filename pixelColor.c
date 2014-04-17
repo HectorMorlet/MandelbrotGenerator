@@ -15,9 +15,13 @@
 
 #define MAX_STEPS 256
 
-#define COLOR_R 204 // Green: 152
-#define COLOR_G 76  // Green: 213
-#define COLOR_B 76  // Green: 140
+#define COLOR_R 76  // Red: 204 // Green: 152
+#define COLOR_G 140 // Red: 76  // Green: 213
+#define COLOR_B 204 // Red: 76  // Green: 140
+
+#define COLOR_2_R 204
+#define COLOR_2_G 76
+#define COLOR_2_B 76
 
 
 static int lerp(int start, int end, double t);
