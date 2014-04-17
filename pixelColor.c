@@ -15,23 +15,9 @@
 
 #define MAX_STEPS 256
 
-// Orange and blue palette
-#define ORANGE_R 152
-#define ORANGE_G 213
-#define ORANGE_B 140
-
-#define BLUE_R 0
-#define BLUE_G 149
-#define BLUE_B 255
-
-// Red and white palette
-#define RED_R 255
-#define RED_G 0
-#define RED_B 0
-
-#define WHITE_R 0
-#define WHITE_G 0
-#define WHITE_B 0
+#define COLOR_R 204 // Green: 152
+#define COLOR_G 76  // Green: 213
+#define COLOR_B 76  // Green: 140
 
 
 static int lerp(int start, int end, double t);
@@ -46,7 +32,7 @@ static int lerp(int start, int end, double t);
 unsigned char stepsToRed(int steps) {
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * ORANGE_R / 255.0;
+			return i * 25 * COLOR_R / 255.0;
 		}
 	}
 
@@ -56,14 +42,14 @@ unsigned char stepsToRed(int steps) {
 		return 0;
 	}
 
-	return lerp(ORANGE_R, 0, (double) steps / MAX_STEPS);
+	return lerp(COLOR_R, 0, (double) steps / MAX_STEPS);
 }
 
 
 unsigned char stepsToGreen(int steps) {
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * ORANGE_G / 255.0;
+			return i * 25 * COLOR_G / 255.0;
 		}
 	}
 
@@ -73,14 +59,14 @@ unsigned char stepsToGreen(int steps) {
 		return 0;
 	}
 
-	return lerp(ORANGE_G, 0, (double) steps / MAX_STEPS);
+	return lerp(COLOR_G, 0, (double) steps / MAX_STEPS);
 }
 
 
 unsigned char stepsToBlue(int steps) {
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * ORANGE_B / 255.0;
+			return i * 25 * COLOR_B / 255.0;
 		}
 	}
 
@@ -90,7 +76,7 @@ unsigned char stepsToBlue(int steps) {
 		return 0;
 	}
 
-	return lerp(ORANGE_B, 0, (double) steps / MAX_STEPS);
+	return lerp(COLOR_B, 0, (double) steps / MAX_STEPS);
 }
 
 
