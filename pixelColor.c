@@ -25,13 +25,13 @@
 #define BLUE_B 255
 
 // Red and white palette
-#define RED_R 183
+#define RED_R 255
 #define RED_G 0
 #define RED_B 0
 
-#define WHITE_R 255
-#define WHITE_G 255
-#define WHITE_B 255
+#define WHITE_R 0
+#define WHITE_G 0
+#define WHITE_B 0
 
 
 static int lerp(int start, int end, double t);
@@ -44,17 +44,17 @@ static int lerp(int start, int end, double t);
 
 
 unsigned char stepsToRed(int steps) {
-	return lerp(WHITE_R, RED_R, (double) steps / MAX_STEPS);
+	return lerp(ORANGE_R, BLUE_R, (double) steps / MAX_STEPS);
 }
 
 
 unsigned char stepsToGreen(int steps) {
-	return lerp(WHITE_G, RED_G, (double) steps / MAX_STEPS);
+	return lerp(ORANGE_G, BLUE_G, (double) steps / MAX_STEPS);
 }
 
 
 unsigned char stepsToBlue(int steps) {
-	return lerp(WHITE_B, RED_B, (double) steps / MAX_STEPS);
+	return lerp(ORANGE_B, BLUE_B, (double) steps / MAX_STEPS);
 }
 
 
