@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 		// Read the client's request
 		char request[REQUEST_BUFFER_SIZE];
 		int byteCount = read(client, request, sizeof(request) - 1);
-
+		
 		// Ensure there was no error
 		if (byteCount < 0) {
 			printf("Failed to read request from client!\n");
@@ -395,22 +395,21 @@ void runTests(void) {
 
 
 void testPathParsing(void) {
-	// assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == -12.12414);
-	// printf("%lf\n", parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp"));
-	// assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == -123.0);
-	// assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == 134.4124);
-	// // This next assert is the only one that works. WTF
-	// assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == 235.0);
+	assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == -12.12414);
+	assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == -123.0);
+	assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == 134.4124);
+	// This next assert is the only one that works. WTF
+	assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == 235.0);
 
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == 235235.234234);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == 234234.0);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == -234234.0);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == -234234.234234);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == 235235.234234);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == 234234.0);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == -234234.0);
+	assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == -234234.234234);
 
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234.0);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624.0);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == -234322344.0);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.bmp") == -23423324.0);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234.0);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624.0);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-234322344.bmp") == -234322344.0);
+	assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.bmp") == -23423324.0);
 }
 
 
