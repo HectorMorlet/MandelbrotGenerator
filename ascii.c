@@ -1,12 +1,25 @@
+
+//
+//  Mandelbrot ASCII
+//  17 April 2014
+//
+
+
+//  Prints out the mandelbrot set at a set zoom level in ASCII
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#define MAX_STEPS 256
-#define true 1
+
+#define true  1
 #define false 0
+
+#define MAX_STEPS        256
 #define SET_EXCEED_VALUE 4.0
+#define ZOOM             4
 
 
 int escapeSteps(double x, double y) {
@@ -35,10 +48,21 @@ int escapeSteps(double x, double y) {
 }
 
 
-
 int main(int argc, char *argv[]) {
-t
+	for (int y = -10; y < 10; y++) {
+		for (int x = -30; x < 30; x++) {
+			double actualX = x * exp2(-ZOOM);
+			double actualY = y * exp2(-ZOOM);
+			int escape = escapeSteps(actualX, actualY);
+
+			if (escape == MAX_STEPS) {
+				printf("*");
+			} else {
+				printf(" ");
+			}
+		}
+
+		printf("\n");
+	}
 	return EXIT_SUCCESS;
 }
-
-
