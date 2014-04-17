@@ -80,20 +80,22 @@ int main(int argc, char *argv[]) {
 			printf("Request:\n%s\n", request);
 
 			// Extract the path from the request
-			char *pathStart = strchr(request, ' ') + 1;
-			printf("Path start: %p\n", pathStart);
-			char *pathEnd = strchr(pathStart, ' ') - 1;
+			char *pathStart = strchr(request, ' ');
+			if (pathStart) {
+				pathStart++;
+				char *pathEnd = strchr(pathStart, ' ') - 1;
 
-			long length = pathEnd - pathStart + 1;
-			char path[length + 1];
+				long length = pathEnd - pathStart + 1;
+				char path[length + 1];
 
-			strncpy(path, pathStart, length);
-			path[length] = '\0';
-			printf("Path extracted from request.\n");
+				strncpy(path, pathStart, length);
+				path[length] = '\0';
+				printf("Path extracted from request.\n");
 
-			// Respond to the client
-			printf("Responding to request for: %s\n", path);
-			respondToClient(client, path);
+				// Respond to the client
+				printf("Responding to request for: %s\n", path);
+				respondToClient(client, path);
+			}
 		}
 
 		printf("Closing client connection...\n\n------------------\n\n------------------\n\n");
@@ -272,9 +274,14 @@ static void serveBitmap(int socket, char *path) {
 	double startX = parseX(path);
 	double startY = parseY(path);
 
-	writeFractal(socket, startX, startY, zoom);
+	char *message =
+		"HTTP/1.0 200 Found\r\n"
+		"Content-Type: image/bmp\r\n"
+		"\r\n";
+	int success = write(socket, message, strlen(message));
+	assert(success >= 0);
 
-	printf("BMP served: X: %lf, Y: %lf, Z: %d\n", startX, startY, zoom);
+	writeFractal(socket, startX, startY, zoom);
 }
 
 
