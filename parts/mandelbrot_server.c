@@ -33,7 +33,7 @@
 #define FRACTAL_WIDTH  512
 #define FRACTAL_HEIGHT 512
 
-#define ZOOM 4
+#define ZOOM 8
 
 
 static int createServer(int port);
@@ -214,8 +214,8 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 static void respondToClient(int socket, char *path) {
 	writeBitmapHeader(socket);
 
-	for (int y = -128; y < 128; y++) {
-		for (int x = -128; x < 128; x++) {
+	for (int y = -(FRACTAL_HEIGHT / 2); y < FRACTAL_HEIGHT / 2; y++) {
+		for (int x = -(FRACTAL_WIDTH / 2); x < FRACTAL_WIDTH / 2; x++) {
 			double actualX = x * exp2(-ZOOM);
 			double actualY = y * exp2(-ZOOM);
 			int escape = escapeSteps(actualX, actualY);
