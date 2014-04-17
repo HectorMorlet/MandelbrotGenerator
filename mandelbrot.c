@@ -349,6 +349,10 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 		b, g, r
 	};
 
+	printf("Writing pixel with blue: %d\n", b);
+	printf("Writing pixel with green: %d\n", g);
+	printf("Writing pixel with red: %d\n", r);
+
 	success = write(socket, color, sizeof(color));
 	assert(success >= 0);
 }
@@ -370,11 +374,7 @@ static void writeFractal(int socket, double startX, double startY,
 			double actualY = y * exp2(-zoom) + startY;
 			int escape = escapeSteps(actualX, actualY);
 
-			if (escape == MAX_STEPS) {
-				writePixel(socket, 0x00, 0x00, 0x00);
-			} else {
-				writePixel(socket, 0xff, 0xff, 0xff);
-			}
+			writePixel(socket, stepsToRed(escape), stepsToGreen(escape), stepsToBlue(escape));
 
 			x++;
 		}
