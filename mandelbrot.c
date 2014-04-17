@@ -291,11 +291,7 @@ static void serveFractalViewer(int socket) {
 
 	message =
 		"<!DOCTYPE html>\n"
-		"<html>\n"
-		"<body>\n"
-		"<script src=\"tiles.js\"></script>\n"
-		"</body>\n"
-		"</html>\n"
+		"<script src=\"https://almondbread.cse.unsw.edu.au/tiles.js\"></script>\n"
 		"\n";
 	success = write(socket, message, strlen(message));
 	assert(success >= 0);
@@ -357,11 +353,13 @@ static void writeFractal(int socket, double startX, double startY,
 	int y = -(FRACTAL_HEIGHT / 2);
 	int x = -(FRACTAL_WIDTH / 2);
 
+	double actualZoom = exp2(-zoom);
+
 	while (y < FRACTAL_HEIGHT / 2) {
 		x = -(FRACTAL_WIDTH / 2);
 		while (x < FRACTAL_WIDTH / 2) {
-			double actualX = x * exp2(-zoom) + startX;
-			double actualY = y * exp2(-zoom) + startY;
+			double actualX = x * actualZoom + startX;
+			double actualY = y * actualZoom + startY;
 			int escape = escapeSteps(actualX, actualY);
 
 			writePixel(socket, stepsToRed(escape), stepsToGreen(escape), stepsToBlue(escape));
