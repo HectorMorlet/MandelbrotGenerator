@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
 		// Read the client's request
 		char request[REQUEST_BUFFER_SIZE];
-		int byteCount = read(client, request, sizeof(request) - 1);
+		long byteCount = read(client, request, sizeof(request) - 1);
 
 		// Ensure there was no error
 		if (byteCount < 0) {
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 			char *pathEnd = strchr(pathStart, ' ') - 1;
 			printf("pathEnd extracted from request: %s\n", pathEnd);
 
-			int length = pathEnd - pathStart + 1;
+			long length = pathEnd - pathStart + 1;
 			char path[length + 1];
 			printf("Path length determined from request.\n");
 
@@ -285,7 +285,7 @@ static void serveBitmap(int socket, char *path) {
 static void serveFractalViewer(int socket) {
 	printf("Serving fractal viewer...\n");
 
-	int success;
+	long success;
 	char *message;
 
 	message =
@@ -316,7 +316,7 @@ static void serveFractalViewer(int socket) {
 
 static void writeBitmapHeader(int socket) {
 	printf("Writing bitmap header...\n");
-	int success;
+	long success;
 
 	unsigned char header[] = {
 		0x42, 0x4D, // Format ID
@@ -343,7 +343,7 @@ static void writeBitmapHeader(int socket) {
 
 static void writePixel(int socket, unsigned char r, unsigned char g,
 		unsigned char b) {
-	int success;
+	long success;
 
 	unsigned char color[] = {
 		b, g, r
