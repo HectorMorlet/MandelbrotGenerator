@@ -16,9 +16,9 @@
 #define MAX_STEPS 256
 
 // Orange and blue palette
-#define ORANGE_R 152
-#define ORANGE_G 213
-#define ORANGE_B 140
+#define ORANGE_R 255
+#define ORANGE_G 50
+#define ORANGE_B 255
 
 #define BLUE_R 0
 #define BLUE_G 149
@@ -46,7 +46,7 @@ static int lerp(int start, int end, double t);
 unsigned char stepsToRed(int steps) {
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * ORANGE_R / 255.0;
+			return i * 25 * ORANGE_R % 255;
 		}
 	}
 
@@ -63,7 +63,7 @@ unsigned char stepsToRed(int steps) {
 unsigned char stepsToGreen(int steps) {
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * ORANGE_G / 255.0;
+			return i * 25 * ORANGE_G % 255;
 		}
 	}
 
@@ -80,7 +80,7 @@ unsigned char stepsToGreen(int steps) {
 unsigned char stepsToBlue(int steps) {
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * ORANGE_B / 255.0;
+			return i * 25 * ORANGE_B % 255;
 		}
 	}
 
