@@ -50,11 +50,10 @@ static double parseY(char *path);
 static int parseZoom(char *path);
 
 static void writeBitmapHeader(int socket);
-static void writePixel(int socket, unsigned char b);
-static void writeFractal(int socket,
-                         double startX,
-                         double startY,
-                         int zoom);
+static void writePixel(int socket, unsigned char r, unsigned char g,
+	unsigned char b);
+static void writeFractal(int socket, double startX, double startY,
+	int zoom);
 
 
 
@@ -251,8 +250,7 @@ static int parseZoom(char *path) {
 // -------------------------------------------- //
 
 
-static void respondToClient(int socket,
-                            char *path) {
+static void respondToClient(int socket, char *path) {
 	printf("Responding to client...\n");
 
 	int requestType = determineRequestTypeForPath(path);
@@ -265,8 +263,7 @@ static void respondToClient(int socket,
 }
 
 
-static void serveBitmap(int socket,
-                        char *path) {
+static void serveBitmap(int socket, char *path) {
 	printf("Serving bitmap...\n");
 	int zoom = parseZoom(path);
 	double startX = parseX(path);
@@ -333,10 +330,8 @@ static void writeBitmapHeader(int socket) {
 }
 
 
-static void writePixel(int socket,
-                       unsigned char r,
-                       unsigned char g,
-                       unsigned char b) {
+static void writePixel(int socket, unsigned char r, unsigned char g,
+		unsigned char b) {
 	long success;
 
 	unsigned char color[] = {
@@ -348,10 +343,8 @@ static void writePixel(int socket,
 }
 
 
-static void writeFractal(int socket,
-                         double startX,
-                         double startY,
-                         int zoom) {
+static void writeFractal(int socket, double startX, double startY,
+		int zoom) {
 	printf("Writing fractal...\n");
 
 	writeBitmapHeader(socket);
@@ -368,7 +361,8 @@ static void writeFractal(int socket,
 			double actualY = y * actualZoom + startY;
 			int escape = escapeSteps(actualX, actualY);
 
-			writePixel(socket, stepsToRed(escape), stepsToGreen(escape), stepsToBlue(escape));
+			writePixel(socket, stepsToRed(escape), stepsToGreen(escape),
+				stepsToBlue(escape));
 
 			x++;
 		}

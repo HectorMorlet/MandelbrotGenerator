@@ -52,6 +52,8 @@ unsigned char stepsToRed(int steps) {
 
 	if (steps >= 253) {
 		return 0;
+	} else if (steps <= 2) {
+		return 0;
 	}
 
 	return lerp(ORANGE_R, 0, (double) steps / MAX_STEPS);
@@ -67,6 +69,8 @@ unsigned char stepsToGreen(int steps) {
 
 	if (steps >= 253) {
 		return 0;
+	} else if (steps <= 2) {
+		return 0;
 	}
 
 	return lerp(ORANGE_G, 0, (double) steps / MAX_STEPS);
@@ -81,6 +85,8 @@ unsigned char stepsToBlue(int steps) {
 	}
 
 	if (steps >= 253) {
+		return 0;
+	} else if (steps <= 2) {
 		return 0;
 	}
 
