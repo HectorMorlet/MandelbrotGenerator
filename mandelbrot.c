@@ -20,21 +20,20 @@
 #include "pixelColor.h"
 
 
-#define true  1
-#define false 0
+#define TRUE                1
+#define FALSE               0
 
 #define PORT                8080
-#define REQUEST_BUFFER_SIZE 1000
+#define REQUEST_BUFFER_SIZE 2048
 
 #define IMAGE_REQUEST_TYPE  0
 #define VIEWER_REQUEST_TYPE 1
 
-#define MAX_STEPS            256
-#define SET_EXCEED_VALUE     4.0
-#define MAX_URL_PARAM_LENGTH 30
+#define MAX_STEPS           256
+#define SET_EXCEED_VALUE    4.0
 
-#define FRACTAL_WIDTH  512
-#define FRACTAL_HEIGHT 512
+#define FRACTAL_WIDTH       512
+#define FRACTAL_HEIGHT      512
 
 
 static int createServer(int port);
@@ -51,10 +50,11 @@ static double parseY(char *path);
 static int parseZoom(char *path);
 
 static void writeBitmapHeader(int socket);
-static void writePixel(int socket, unsigned char r, unsigned char g,
-	unsigned char b);
-static void writeFractal(int socket, double startX, double startY,
-	int zoom);
+static void writePixel(int socket, unsigned char b);
+static void writeFractal(int socket,
+                         double startX,
+                         double startY,
+                         int zoom);
 
 
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
 	int server = createServer(PORT);
 
-	int running = true;
+	int running = TRUE;
 	while (running) {
 		// Wait for a connection
 		int client = waitForConnection(server);
@@ -251,7 +251,8 @@ static int parseZoom(char *path) {
 // -------------------------------------------- //
 
 
-static void respondToClient(int socket, char *path) {
+static void respondToClient(int socket,
+                            char *path) {
 	printf("Responding to client...\n");
 
 	int requestType = determineRequestTypeForPath(path);
@@ -264,7 +265,8 @@ static void respondToClient(int socket, char *path) {
 }
 
 
-static void serveBitmap(int socket, char *path) {
+static void serveBitmap(int socket,
+                        char *path) {
 	printf("Serving bitmap...\n");
 	int zoom = parseZoom(path);
 	double startX = parseX(path);
@@ -331,8 +333,10 @@ static void writeBitmapHeader(int socket) {
 }
 
 
-static void writePixel(int socket, unsigned char r, unsigned char g,
-		unsigned char b) {
+static void writePixel(int socket,
+                       unsigned char r,
+                       unsigned char g,
+                       unsigned char b) {
 	long success;
 
 	unsigned char color[] = {
@@ -344,8 +348,10 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 }
 
 
-static void writeFractal(int socket, double startX, double startY,
-		int zoom) {
+static void writeFractal(int socket,
+                         double startX,
+                         double startY,
+                         int zoom) {
 	printf("Writing fractal...\n");
 
 	writeBitmapHeader(socket);
@@ -380,12 +386,12 @@ static void writeFractal(int socket, double startX, double startY,
 
 int escapeSteps(double x, double y) {
 	int i = 0;
-	int isInSet = true;
+	int isInSet = TRUE;
 
 	double r = x;
 	double s = y;
 
-	while (i < MAX_STEPS && isInSet == true) {
+	while (i < MAX_STEPS && isInSet == TRUE) {
 		double currentR = r;
 		double currentS = s;
 
@@ -394,7 +400,7 @@ int escapeSteps(double x, double y) {
 
 		double check = r * r + s * s;
 		if (check > SET_EXCEED_VALUE) {
-			isInSet = false;
+			isInSet = FALSE;
 		} else {
 			i++;
 		}
