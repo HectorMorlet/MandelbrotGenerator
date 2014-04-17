@@ -77,8 +77,11 @@ int main(int argc, char *argv[]) {
 		} else {
 			printf("Started main if statement...\n");
 
+			printf("Request:\n%s\n", request);
+
 			// Extract the path from the request
 			char *pathStart = strchr(request, ' ') + 1;
+			printf("Path start: %p\n", pathStart);
 			char *pathEnd = strchr(pathStart, ' ') - 1;
 
 			long length = pathEnd - pathStart + 1;
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
 			respondToClient(client, path);
 		}
 
-		printf("Closing client connection...\n");
+		printf("Closing client connection...\n\n------------------\n\n------------------\n\n");
 		close(client);
 	}
 
