@@ -65,7 +65,6 @@ int main(int argc, char *argv[]) {
 
 	int running = TRUE;
 	while (running) {
-		printf("Started server while loop...\n");
 		// Wait for a connection
 		int client = waitForConnection(server);
 
@@ -81,15 +80,10 @@ int main(int argc, char *argv[]) {
 
 			// Extract the path from the request
 			char *pathStart = strchr(request, ' ') + 1;
-			printf("pathStart extracted from request: %s\n", pathStart);
-
-			// Segmentation fault is caused by trying to read pathStart!!!!
 			char *pathEnd = strchr(pathStart, ' ') - 1;
-			printf("pathEnd extracted from request: %s\n", pathEnd);
 
 			long length = pathEnd - pathStart + 1;
 			char path[length + 1];
-			printf("Path length determined from request.\n");
 
 			strncpy(path, pathStart, length);
 			path[length] = '\0';
@@ -352,10 +346,6 @@ static void writePixel(int socket,
 	unsigned char color[] = {
 		b, g, r
 	};
-
-	printf("Writing pixel with blue: %d\n", b);
-	printf("Writing pixel with green: %d\n", g);
-	printf("Writing pixel with red: %d\n", r);
 
 	success = write(socket, color, sizeof(color));
 	assert(success >= 0);
