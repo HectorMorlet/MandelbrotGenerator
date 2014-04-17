@@ -63,11 +63,6 @@ void testDetermineRequestType(void);
 
 
 
-// -------------------------------------------- //
-//   Server                                     //
-// -------------------------------------------- //
-
-
 int main(int argc, char *argv[]) {
 	runTests();
 
@@ -99,7 +94,7 @@ int main(int argc, char *argv[]) {
 
 			// Respond to the client
 			printf("Responding to request for: %s\n", path);
-			respondToClient(client, path);
+			respondTotClient(client, path);
 		}
 
 		close(client);
@@ -109,6 +104,12 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
+
+
+
+// -------------------------------------------- //
+//   Server                                     //
+// -------------------------------------------- //
 
 
 static int createServer(int port) {
@@ -263,7 +264,7 @@ static void serveBitmap(int socket, char *path) {
 }
 
 
-static void serveFractalViewer (int socket) {
+static void serveFractalViewer(int socket) {
 	printf("Serving fractal viewer.\n");
 	char *message;
 
@@ -332,8 +333,8 @@ static void writeFractal(int socket, double startX, double startY,
 
 	int x = -(FRACTAL_WIDTH / 2);
 	int y = -(FRACTAL_HEIGHT / 2);
-	while (x <= FRACTAL_WIDTH/2) {
-		while (y <= FRACTAL_HEIGHT/2) {
+	while (x < FRACTAL_WIDTH / 2) {
+		while (y < FRACTAL_HEIGHT / 2) {
 			double actualX = x * exp2(-zoom);
 			double actualY = y * exp2(-zoom);
 

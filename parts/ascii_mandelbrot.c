@@ -1,4 +1,5 @@
 
+
 //
 //  ascii.c
 //  Mandelbrot ASCII
@@ -21,7 +22,7 @@
 
 #define MAX_STEPS        256
 #define SET_EXCEED_VALUE 4.0
-#define ZOOM             4
+#define ZOOM             6
 
 
 int escapeSteps(double x, double y) {
@@ -52,7 +53,7 @@ int escapeSteps(double x, double y) {
 
 int main(int argc, char *argv[]) {
 	for (int y = -10; y < 10; y++) {
-		for (int x = -30; x < 30; x++) {
+		for (int x = -50; x < 30; x++) {
 			double actualX = x * exp2(-ZOOM);
 			double actualY = y * exp2(-ZOOM);
 			int escape = escapeSteps(actualX, actualY);
@@ -66,5 +67,6 @@ int main(int argc, char *argv[]) {
 
 		printf("\n");
 	}
+
 	return EXIT_SUCCESS;
 }
