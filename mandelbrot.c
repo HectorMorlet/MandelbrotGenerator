@@ -57,15 +57,8 @@ static void writeFractal(int socket, double startX, double startY,
 	int zoom);
 
 
-void runTests(void);
-void testPathParsing(void);
-void testDetermineRequestType(void);
-
-
 
 int main(int argc, char *argv[]) {
-	runTests();
-
 	printf("Starting server...\n");
 
 	int server = createServer(PORT);
@@ -253,28 +246,25 @@ static void respondToClient(int socket, char *path) {
 
 static void serveBitmap(int socket, char *path) {
 	int zoom = parseZoom(path);
-	double startX = parseX(path);// * exp2(-zoom);
-	double startY = parseY(path);// * exp2(-zoom);
+	double startX = parseX(path);
+	double startY = parseY(path);
 
-	printf("Serving bitmap with startX: %lf\n", startX);
-	printf("Serving bitmap with startY: %lf\n", startY);
-	printf("Serving bitmap with zoom: %d\n", zoom);
+	printf("%d, %lf, %lf\n", zoom, startX, startY);
 
 	writeFractal(socket, startX, startY, zoom);
 }
 
 
 static void serveFractalViewer(int socket) {
-	printf("Serving fractal viewer.\n");
+	int success;
 	char *message;
 
-	// first send the http response header
 	message =
 		"HTTP/1.0 200 Found\r\n"
 		"Content-Type: text/html\r\n"
 		"\r\n";
-	printf("about to send=> %s\n", message);
-	write(socket, message, strlen(message));
+	success = write(socket, message, strlen(message));
+	assert(success >= 0);
 
 	message =
 		"<!DOCTYPE html>\n"
@@ -284,7 +274,8 @@ static void serveFractalViewer(int socket) {
 		"</body>\n"
 		"</html>\n"
 		"\n";
-	write(socket, message, strlen(message));
+	success = write(socket, message, strlen(message));
+	assert(success >= 0);
 }
 
 
@@ -298,13 +289,12 @@ static void writeBitmapHeader(int socket) {
 	int success;
 
 	unsigned char header[] = {
-		0x42, 0x4d, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
-		0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00,
-		0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x24, 0x00, 0x00, 0x00, 0x13, 0x0b,
-		0x00, 0x00, 0x13, 0x0b, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x42, 0x4D, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x02,
+		0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x24, 0x00, 0x00, 0x00, 0x13, 0x0B,
+		0x00, 0x00, 0x13, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
 	};
 
 	success = write(socket, header, sizeof(header));
@@ -316,13 +306,11 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 		unsigned char b) {
 	int success;
 
-	success = write(socket, &r, sizeof(r));
-	assert(success >= 0);
+	unsigned char color[] = {
+		b, g, r
+	};
 
-	success = write(socket, &g, sizeof(g));
-	assert(success >= 0);
-
-	success = write(socket, &b, sizeof(b));
+	success = write(socket, color, sizeof(color));
 	assert(success >= 0);
 }
 
@@ -331,27 +319,34 @@ static void writeFractal(int socket, double startX, double startY,
 		int zoom) {
 	writeBitmapHeader(socket);
 
-	int x = -(FRACTAL_WIDTH / 2);
 	int y = -(FRACTAL_HEIGHT / 2);
-	while (x < FRACTAL_WIDTH / 2) {
-		while (y < FRACTAL_HEIGHT / 2) {
-			double actualX = x * exp2(-zoom);
-			double actualY = y * exp2(-zoom);
+	int x = -(FRACTAL_WIDTH / 2);
 
-			int steps = escapeSteps(actualX + startX, actualY + startY);
+	while (y < FRACTAL_HEIGHT / 2) {
+		x = -(FRACTAL_WIDTH / 2);
+		while (x < FRACTAL_WIDTH / 2) {
+			double actualX = x * exp2(-zoom) + startX;
+			double actualY = y * exp2(-zoom) + startY;
+			int escape = escapeSteps(actualX, actualY);
 
-			unsigned char red = (unsigned char) stepsToRed(steps);
-			unsigned char green = (unsigned char) stepsToGreen(steps);
-			unsigned char blue = (unsigned char) stepsToBlue(steps);
+			if (escape == MAX_STEPS) {
+				writePixel(socket, 0x00, 0x00, 0x00);
+			} else {
+				writePixel(socket, 0xff, 0xff, 0xff);
+			}
 
-			writePixel(socket, red, green, blue);
-
-			y++;
+			x++;
 		}
 
-		x++;
+		y++;
 	}
 }
+
+
+
+// -------------------------------------------- //
+//   Mandelbrot Generation                      //
+// -------------------------------------------- //
 
 
 int escapeSteps(double x, double y) {
@@ -377,48 +372,4 @@ int escapeSteps(double x, double y) {
 	}
 
 	return i;
-}
-
-
-
-// -------------------------------------------- //
-//   Unit Tests                                 //
-// -------------------------------------------- //
-
-
-void runTests(void) {
-	testDetermineRequestType();
-	testPathParsing();
-
-	printf("All tests passed!\n");
-	printf("We are awesome!\n");
-}
-
-
-void testPathParsing(void) {
-	// assert(parseX("http://localhost:[port]/tile_x-12.12414_y[y]_z[zoom level].bmp") == -12.12414);
-	// printf("%lf\n", parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp"));
-	// assert(parseX("http://localhost:[port]/tile_x-123_y[y]_z[zoom level].bmp") == -123.0);
-	// assert(parseX("http://localhost:[port]/tile_x134.4124_y[y]_z[zoom level].bmp") == 134.4124);
-	// // This next assert is the only one that works. WTF
-	// assert(parseX("http://localhost:[port]/tile_x235_y[y]_z[zoom level].bmp") == 235.0);
-
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y235235.234234_z[zoom level].bmp") == 235235.234234);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y234234_z[zoom level].bmp") == 234234.0);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234_z[zoom level].bmp") == -234234.0);
-	// assert(parseY("http://localhost:[port]/tile_x-[x]_y-234234.234234_z[zoom level].bmp") == -234234.234234);
-
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z234234234.bmp") == 234234234.0);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z23443624.234234.bmp") == 23443624.0);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-2343223434.bmp") == -234322344.0);
-	// assert(parseZoom("http://localhost:[port]/tile_x-[x]_y[y]_z-23423324.bmp") == -23423324.0);
-}
-
-
-void testDetermineRequestType(void) {
-	assert(determineRequestTypeForPath("/hello") == VIEWER_REQUEST_TYPE);
-	assert(determineRequestTypeForPath("/test/owiejf") == VIEWER_REQUEST_TYPE);
-	assert(determineRequestTypeForPath("/test.bmp") == IMAGE_REQUEST_TYPE);
-	assert(determineRequestTypeForPath("/meh/meh2.bmp") == IMAGE_REQUEST_TYPE);
-	assert(determineRequestTypeForPath("/index.bmp") == IMAGE_REQUEST_TYPE);
 }

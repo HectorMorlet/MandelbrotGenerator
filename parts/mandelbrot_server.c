@@ -145,7 +145,7 @@ static int waitForConnection(int server) {
 
 
 // -------------------------------------------- //
-//   Server Response                            //
+//   Mandelbrot Generation                      //
 // -------------------------------------------- //
 
 
@@ -214,10 +214,31 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 static void respondToClient(int socket, char *path) {
 	writeBitmapHeader(socket);
 
-	for (int y = -(FRACTAL_HEIGHT / 2); y < FRACTAL_HEIGHT / 2; y++) {
-		for (int x = -(FRACTAL_WIDTH / 2); x < FRACTAL_WIDTH / 2; x++) {
-			double actualX = x * exp2(-ZOOM);
-			double actualY = y * exp2(-ZOOM);
+	// for (int y = -(FRACTAL_HEIGHT / 2); y < FRACTAL_HEIGHT / 2; y++) {
+	// 	for (int x = -(FRACTAL_WIDTH / 2); x < FRACTAL_WIDTH / 2; x++) {
+	// 		double actualX = x * exp2(-ZOOM);
+	// 		double actualY = y * exp2(-ZOOM);
+	// 		int escape = escapeSteps(actualX, actualY);
+
+	// 		if (escape == MAX_STEPS) {
+	// 			writePixel(socket, 0x00, 0x00, 0x00);
+	// 		} else {
+	// 			writePixel(socket, 0xff, 0xff, 0xff);
+	// 		}
+	// 	}
+	// }
+
+	double startX = 0.0;
+	double startY = 0.0;
+
+	int y = -(FRACTAL_HEIGHT / 2);
+	int x = -(FRACTAL_WIDTH / 2);
+
+	while (y < FRACTAL_HEIGHT / 2) {
+		x = -(FRACTAL_WIDTH / 2);
+		while (x < FRACTAL_WIDTH / 2) {
+			double actualX = x * exp2(-ZOOM) + startX;
+			double actualY = y * exp2(-ZOOM) + startY;
 			int escape = escapeSteps(actualX, actualY);
 
 			if (escape == MAX_STEPS) {
@@ -225,6 +246,10 @@ static void respondToClient(int socket, char *path) {
 			} else {
 				writePixel(socket, 0xff, 0xff, 0xff);
 			}
+
+			x++;
 		}
+
+		y++;
 	}
 }
