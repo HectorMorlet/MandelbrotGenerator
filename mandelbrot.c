@@ -182,12 +182,14 @@ static int determineRequestTypeForPath(char *path) {
 	printf("Determining request type...\n");
 
 	int type = VIEWER_REQUEST_TYPE;
-	char *extention = strrchr(path, '.');
+	char *extension = strrchr(path, '.');
 
-	if (!extention) {
+	// If there was no extension found
+	if (!extension) {
 		type = VIEWER_REQUEST_TYPE;
 	} else {
-		if (strcmp(extention, ".bmp") == 0) {
+		// If the extension was .bmp, then it was an image request
+		if (strcmp(extension, ".bmp") == 0) {
 			type = IMAGE_REQUEST_TYPE;
 		} else {
 			type = VIEWER_REQUEST_TYPE;
@@ -201,13 +203,17 @@ static int determineRequestTypeForPath(char *path) {
 static double parseX(char *path) {
 	printf("Parsing X...\n");
 
-	char *str = strchr(path, 'x');
 	double x;
+
+	// Get the start of the string we want to turn into a float
+	char *str = strchr(path, 'x');
 
 	if (!str) {
 		x = 0.0;
 	} else {
 		str++;
+
+		// Retrieve the float value from the string
 		sscanf(str, "%lf", &x);
 	}
 
@@ -218,13 +224,17 @@ static double parseX(char *path) {
 static double parseY(char *path) {
 	printf("Parsing Y...\n");
 
-	char *str = strchr(path, 'y');
 	double y;
+
+	// Get the start of the string
+	char *str = strchr(path, 'y');
 
 	if (!str) {
 		y = 0.0;
 	} else {
 		str++;
+
+		// Retrieve the value
 		sscanf(str, "%lf", &y);
 	}
 
@@ -235,13 +245,17 @@ static double parseY(char *path) {
 static int parseZoom(char *path) {
 	printf("Parsing zoom...\n");
 
-	char *str = strchr(path, 'z');
 	int zoom;
+
+	// Retrieve the start of the string
+	char *str = strchr(path, 'z');
 
 	if (!str) {
 		zoom = 0;
 	} else {
 		str++;
+
+		// Retrieve the value
 		sscanf(str, "%d", &zoom);
 	}
 
@@ -260,6 +274,7 @@ static void respondToClient(int socket, char *path) {
 
 	int requestType = determineRequestTypeForPath(path);
 
+	// Serve different things depending on the request type
 	if (requestType == VIEWER_REQUEST_TYPE) {
 		serveFractalViewer(socket);
 	} else if (requestType == IMAGE_REQUEST_TYPE) {
@@ -270,10 +285,13 @@ static void respondToClient(int socket, char *path) {
 
 static void serveBitmap(int socket, char *path) {
 	printf("Serving bitmap...\n");
+
+	// Fetch the X, Y, and zoom from the URL (path)
 	int zoom = parseZoom(path);
 	double startX = parseX(path);
 	double startY = parseY(path);
 
+	// Send the HTTP header
 	char *message =
 		"HTTP/1.0 200 Found\r\n"
 		"Content-Type: image/bmp\r\n"
@@ -281,6 +299,7 @@ static void serveBitmap(int socket, char *path) {
 	int success = write(socket, message, strlen(message));
 	assert(success >= 0);
 
+	// Write the fractal to the socket
 	writeFractal(socket, startX, startY, zoom);
 }
 
@@ -291,6 +310,7 @@ static void serveFractalViewer(int socket) {
 	long success;
 	char *message;
 
+	// Send the HTTP header
 	message =
 		"HTTP/1.0 200 Found\r\n"
 		"Content-Type: text/html\r\n"
@@ -298,6 +318,7 @@ static void serveFractalViewer(int socket) {
 	success = write(socket, message, strlen(message));
 	assert(success >= 0);
 
+	// Send the HTML viewer
 	message =
 		"<!DOCTYPE html>\n"
 		"<script src=\"https://almondbread.cse.unsw.edu.au/tiles.js\"></script>\n"
@@ -315,8 +336,12 @@ static void serveFractalViewer(int socket) {
 
 static void writeBitmapHeader(int socket) {
 	printf("Writing bitmap header...\n");
+
 	long success;
 
+	// The bitmap header, preconfigured for a 512 by 512 image
+	// The file size, pixel array size, and image width/height are
+	// already configured
 	unsigned char header[] = {
 		0x42, 0x4D, // Format ID
 		0x00, 0x00, 0x04, 0x00, // File size of the BMP in bytes CHANGABLE
@@ -348,6 +373,7 @@ static void writePixel(int socket, unsigned char r, unsigned char g,
 		b, g, r
 	};
 
+	// Write a single pixel to the socket (3 bytes)
 	success = write(socket, color, sizeof(color));
 	assert(success >= 0);
 }
@@ -357,20 +383,34 @@ static void writeFractal(int socket, double startX, double startY,
 		int zoom) {
 	printf("Writing fractal...\n");
 
+	// Send the bitmap header
 	writeBitmapHeader(socket);
 
+	// The center of the image should be (0, 0), so start the x and y
+	// at -256, and finish them at 256, leaving 0 to be in the center
+	// and having a 512 by 512 image
 	int y = -(FRACTAL_HEIGHT / 2);
 	int x = -(FRACTAL_WIDTH / 2);
 
+	// Pre-calculate the zoom, for quicker run time in the loop
 	double actualZoom = exp2(-zoom);
 
+	// Loop over each y row
 	while (y < FRACTAL_HEIGHT / 2) {
+		// Reset the X to be -256
 		x = -(FRACTAL_WIDTH / 2);
+
+		// Loop over each x column
 		while (x < FRACTAL_WIDTH / 2) {
+			// Transform the pixel into "math world" by multiplying
+			// by the zoom, then translate it by the starting x and y
 			double actualX = x * actualZoom + startX;
 			double actualY = y * actualZoom + startY;
+
+			// Calculate the escape steps
 			int escape = escapeSteps(actualX, actualY);
 
+			// Write the pixel to the socket
 			writePixel(socket, stepsToRed(escape), stepsToGreen(escape),
 				stepsToBlue(escape));
 
@@ -389,6 +429,10 @@ static void writeFractal(int socket, double startX, double startY,
 
 
 int escapeSteps(double x, double y) {
+	// Method adapted from:
+	// http://www.cs.princeton.edu/~wayne/mandel/mandel.html
+	// The math is explained there, including formulas
+
 	int i = 0;
 	int isInSet = TRUE;
 
@@ -396,12 +440,15 @@ int escapeSteps(double x, double y) {
 	double s = y;
 
 	while (i < MAX_STEPS && isInSet == TRUE) {
+		// Save the current r and s values for use in the calculations
 		double currentR = r;
 		double currentS = s;
 
+		// Calculate the new r and s values
 		r = currentR * currentR - currentS * currentS + x;
 		s = 2 * currentR * currentS + y;
 
+		// Check if the r and s values are still in the Mandelbrot set
 		double check = r * r + s * s;
 		if (check > SET_EXCEED_VALUE) {
 			isInSet = FALSE;

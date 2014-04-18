@@ -30,53 +30,59 @@ static int lerp(int start, int end, double t);
 
 
 unsigned char stepsToRed(int steps) {
+	unsigned char color = lerp(COLOR_R, 0, (double) steps / MAX_STEPS);
+
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * COLOR_R % 255;
+			color = i * 25 * COLOR_R % 255;
 		}
 	}
 
 	if (steps >= 253) {
-		return 0;
+		color = 0;
 	} else if (steps <= 2) {
-		return 0;
+		color = 0;
 	}
 
-	return lerp(COLOR_R, 0, (double) steps / MAX_STEPS);
+	return color;
 }
 
 
 unsigned char stepsToGreen(int steps) {
+	unsigned char color = lerp(COLOR_G, 0, (double) steps / MAX_STEPS);
+
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * COLOR_G % 255;
+			color = i * 25 * COLOR_G % 255;
 		}
 	}
 
 	if (steps >= 253) {
-		return 0;
+		color = 0;
 	} else if (steps <= 2) {
-		return 0;
+		color = 0;
 	}
 
-	return lerp(COLOR_G, 0, (double) steps / MAX_STEPS);
+	return color;
 }
 
 
 unsigned char stepsToBlue(int steps) {
+	unsigned char color = lerp(COLOR_B, 0, (double) steps / MAX_STEPS);
+
 	for (int i = 1; i < 10; i++) {
 		if (steps == i) {
-			return i * 25 * COLOR_B % 255;
+			color = i * 25 * COLOR_B % 255;
 		}
 	}
 
 	if (steps >= 253) {
-		return 0;
+		color = 0;
 	} else if (steps <= 2) {
-		return 0;
+		color = 0;
 	}
 
-	return lerp(COLOR_B, 0, (double) steps / MAX_STEPS);
+	return color;
 }
 
 
