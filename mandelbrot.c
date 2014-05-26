@@ -440,19 +440,20 @@ int escapeSteps(double x, double y) {
 	double s = y;
 
 	while (i < MAX_STEPS && isInSet == TRUE) {
-		// Save the current r and s values for use in the calculations
-		double currentR = r;
-		double currentS = s;
-
-		// Calculate the new r and s values
-		r = currentR * currentR - currentS * currentS + x;
-		s = 2 * currentR * currentS + y;
-
 		// Check if the r and s values are still in the Mandelbrot set
 		double check = r * r + s * s;
 		if (check > SET_EXCEED_VALUE) {
+			i++;
 			isInSet = FALSE;
 		} else {
+			// Save the current r and s values for use in the calculations
+			double currentR = r;
+			double currentS = s;
+
+			// Calculate the new r and s values
+			r = currentR * currentR - currentS * currentS + x;
+			s = 2 * currentR * currentS + y;
+
 			i++;
 		}
 	}
